@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Piano in the Sky — Blind Box Template</title>
+<link href="https://fonts.googleapis.com/css2?family=Righteous&family=Abril+Fatface&family=Caveat:wght@400;700&family=Permanent+Marker&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #f0ece4;
+  font-family: 'Caveat', cursive;
+  min-height: 100vh;
+}
+
+/* ── top bar ── */
+.topbar {
+  background: #1a1510;
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.topbar-logo {
+  font-family: 'Abril Fatface', serif;
+  font-size: 18px;
+  color: #e8c830;
+}
+.topbar-logo span { color: #7ab8d4; }
+.topbar-tag {
+  font-family: 'Caveat', cursive;
+  font-size: 13px;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+.topbar-badges {
+  display: flex;
+  gap: 8px;
+}
+.badge {
+  font-family: 'Caveat', cursive;
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+.badge-yellow { background: #e8c830; color: #1a1510; }
+.badge-pink { background: #e86b8a; color: white; }
+
+/* ── view toggle ── */
+.view-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px 0 0;
+}
+.vtab {
+  font-family: 'Caveat', cursive;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 8px 22px;
+  border: 2px solid #1a1510;
+  background: transparent;
+  color: #1a1510;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: all 0.18s;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.vtab:hover { background: #e8c830; border-color: #e8c830; }
+.vtab.active { background: #1a1510; color: #e8c830; }
+
+/* ── page layouts ── */
+.view { display: none; padding: 28px 20px 60px; }
+.view.active { display: block; }
+
+/* ════════════════════════
+   FLAT NET / TEMPLATE VIEW
+════════════════════════ */
+
+.net-stage {
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.net-label {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: #8a7060;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.net-info {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.info-chip {
+  background: white;
+  border: 1.5px solid #d0c0b0;
+  border-radius: 20px;
+  padding: 5px 16px;
+  font-family: 'Caveat', cursive;
+  font-size: 14px;
+  font-weight: 700;
+  color: #6a5040;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* The die-cut net — CSS grid layout matching the reference */
+.box-net {
+  position: relative;
+  display: grid;
+  /* columns: [tab] [left] [front] [right] [back] [right-tab] */
+  grid-template-columns: 40px 160px 160px 160px 160px 40px;
+  grid-template-rows: 40px 160px 160px 40px;
+  gap: 0;
+  margin: 0 auto;
+  width: fit-content;
+  filter: drop-shadow(0 8px 32px rgba(0,0,0,0.18));
+}
+
+/* each face is a square with cut marks */
+.face {
+  position: relative;
+  overflow: hidden;
+  outline: 1.5px dashed rgba(100,80,60,0.3);
+}
+
+.face-label {
+  position: absolute;
+  top: 4px;
+  left: 6px;
+  font-family: 'Righteous', sans-serif;
+  font-size: 8px;
+  color: rgba(0,0,0,0.2);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  z-index: 10;
+}
+
+/* GRID PLACEMENT */
+/* Row 1: top flaps */
+.top-flap-left  { grid-column: 2; grid-row: 1; }
+.top-flap-front { grid-column: 3; grid-row: 1; }
+.top-flap-right { grid-column: 4; grid-row: 1; }
+.top-flap-back  { grid-column: 5; grid-row: 1; }
+
+/* Row 2: main faces */
+.face-tab-l  { grid-column: 1; grid-row: 2; }
+.face-left   { grid-column: 2; grid-row: 2; }
+.face-front  { grid-column: 3; grid-row: 2; }
+.face-right  { grid-column: 4; grid-row: 2; }
+.face-back   { grid-column: 5; grid-row: 2; }
+.face-tab-r  { grid-column: 6; grid-row: 2; }
+
+/* Row 3: bottom face */
+.face-bottom { grid-column: 3; grid-row: 3; }
+
+/* Row 4: bottom flap */
+.bot-flap-front { grid-column: 3; grid-row: 4; }
+
+/* flap shapes via clip-path */
+.top-flap-left, .top-flap-right, .top-flap-back {
+  clip-path: polygon(5% 100%, 95% 100%, 100% 0%, 0% 0%);
+}
+.top-flap-front {
+  clip-path: polygon(5% 100%, 95% 100%, 88% 0%, 12% 0%);
+}
+.bot-flap-front {
+  clip-path: polygon(5% 0%, 95% 0%, 88% 100%, 12% 100%);
+}
+.face-tab-l, .face-tab-r {
+  clip-path: polygon(0% 20%, 100% 30%, 100% 70%, 0% 80%);
+}
+
+/* ── FACE BACKGROUNDS ── */
+
+/* FRONT — main face, taupe paper with floating piano + cut letters */
+.face-front {
+  background: #b8a090;
+}
+
+/* LEFT SIDE — sky blue */
+.face-left {
+  background: #c8e0f0;
+}
+
+/* RIGHT SIDE — cream/yellow */
+.face-right {
+  background: #f5ede0;
+}
+
+/* BACK — soft pink */
+.face-back {
+  background: #f0d8d0;
+}
+
+/* BOTTOM */
+.face-bottom {
+  background: #d4c4b0;
+}
+
+/* flaps */
+.top-flap-front { background: #ccc0b0; }
+.top-flap-left  { background: #c0d8ee; }
+.top-flap-right { background: #eee4d4; }
+.top-flap-back  { background: #eaccc4; }
+.bot-flap-front { background: #ccc0b0; }
+.face-tab-l, .face-tab-r { background: #c0b09e; }
+
+/* paper texture overlay for all faces */
+.face::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* cut marks at corners */
+.net-wrap {
+  position: relative;
+}
+
+/* ── FACE CONTENT ── */
+
+/* -- FRONT face content -- */
+.front-inner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 10px;
+  overflow: hidden;
+}
+
+.front-ransom-top {
+  position: absolute;
+  top: 8px;
+  left: 6px;
+  display: flex;
+  gap: 2px;
+  align-items: flex-end;
+}
+
+.rc { 
+  font-weight: 900; 
+  line-height: 1; 
+  display: inline-block; 
+  padding: 1px 4px;
+}
+.rc-p { font-family: 'Abril Fatface', serif; font-size: 22px; background: #7ab8d4; color: white; transform: rotate(-3deg); }
+.rc-i { font-family: 'Unbounded', sans-serif; font-size: 16px; background: #e8c830; color: #1a1510; transform: rotate(2deg); }
+.rc-a { font-family: 'Permanent Marker', cursive; font-size: 20px; background: #e86b8a; color: white; transform: rotate(-2deg); }
+.rc-n { font-family: 'Abril Fatface', serif; font-size: 18px; background: #f5ede0; color: #6a5040; transform: rotate(1deg); border: 1.5px solid #6a5040; }
+.rc-o { font-family: 'Righteous', sans-serif; font-size: 20px; background: #7aab6a; color: white; transform: rotate(-2deg); }
+
+.front-piano-svg {
+  position: absolute;
+  top: 34px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-6deg);
+  width: 80%;
+  filter: drop-shadow(2px 4px 8px rgba(0,0,0,0.3));
+}
+
+.in-sky-strip {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.strip-black {
+  background: #1a1510;
+  color: #e8c830;
+  font-family: 'Caveat', cursive;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  letter-spacing: 0.08em;
+  transform: rotate(-1deg);
+}
+.strip-blue {
+  background: #7ab8d4;
+  color: white;
+  font-family: 'Abril Fatface', serif;
+  font-size: 13px;
+  padding: 1px 7px;
+  transform: rotate(1deg);
+}
+
+.front-cloud-l {
+  position: absolute;
+  top: 42%;
+  left: -4%;
+  width: 50px; height: 18px;
+  background: rgba(255,255,255,0.22);
+  border-radius: 30px;
+}
+.front-cloud-r {
+  position: absolute;
+  top: 55%;
+  right: 0;
+  width: 40px; height: 14px;
+  background: rgba(255,255,255,0.16);
+  border-radius: 30px;
+}
+.front-star-tr {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  font-family: sans-serif;
+  color: #1a1510;
+  font-size: 14px;
+}
+
+/* -- LEFT face (sky blue) -- */
+.left-inner {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.left-sky-gradient {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 45%;
+  background: linear-gradient(to top, rgba(122,171,106,0.35), transparent);
+}
+
+.left-question-marks {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.qmark-big {
+  font-family: 'Abril Fatface', serif;
+  font-size: 60px;
+  color: rgba(255,255,255,0.6);
+  line-height: 1;
+  display: block;
+  text-shadow: 2px 3px 0 rgba(0,0,0,0.1);
+}
+
+.left-stars {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+}
+
+.cut-star-svg { opacity: 0.85; }
+
+.left-label-top {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #e86b8a;
+  color: white;
+  font-family: 'Caveat', cursive;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  white-space: nowrap;
+  transform: translateX(-50%) rotate(-2deg);
+}
+
+.left-cloud-1 {
+  position: absolute;
+  top: 30%;
+  left: 8%;
+  width: 60px; height: 20px;
+  background: rgba(255,255,255,0.5);
+  border-radius: 30px;
+}
+.left-cloud-2 {
+  position: absolute;
+  top: 40%;
+  right: 5%;
+  width: 45px; height: 15px;
+  background: rgba(255,255,255,0.4);
+  border-radius: 30px;
+}
+
+/* -- RIGHT face (cream) -- */
+.right-inner {
+  position: absolute;
+  inset: 0;
+  padding: 12px 10px;
+  overflow: hidden;
+}
+
+.right-title {
+  font-family: 'Permanent Marker', cursive;
+  font-size: 13px;
+  color: #6a5040;
+  transform: rotate(-2deg);
+  display: inline-block;
+  margin-bottom: 8px;
+}
+
+.right-track-mini {
+  font-family: 'Caveat', cursive;
+  font-size: 11px;
+  color: #8a7060;
+  line-height: 1.8;
+  border-left: 2px solid #e86b8a;
+  padding-left: 6px;
+}
+
+.right-tape-h {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  width: 50px; height: 12px;
+  background: rgba(232,200,48,0.55);
+  transform: rotate(10deg);
+}
+
+.right-bottom-block {
+  position: absolute;
+  bottom: 10px;
+  left: 8px;
+  right: 8px;
+}
+
+.rb-year {
+  font-family: 'Abril Fatface', serif;
+  font-size: 32px;
+  color: rgba(184,160,144,0.25);
+  transform: rotate(-5deg);
+  display: block;
+  line-height: 1;
+}
+
+.rb-label {
+  font-family: 'Caveat', cursive;
+  font-size: 10px;
+  color: rgba(106,80,64,0.6);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+/* -- BACK face (soft pink) -- */
+.back-inner {
+  position: absolute;
+  inset: 0;
+  padding: 10px;
+  overflow: hidden;
+}
+
+.back-polaroid {
+  position: absolute;
+  background: white;
+  padding: 5px 5px 16px;
+  box-shadow: 1px 2px 6px rgba(0,0,0,0.2);
+}
+
+.back-sentence {
+  position: absolute;
+  bottom: 14px;
+  left: 8px;
+  right: 8px;
+  background: #1a1510;
+  color: #e8c830;
+  font-family: 'Caveat', cursive;
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 6px 8px;
+  line-height: 1.5;
+  transform: rotate(0.5deg);
+}
+
+.back-deco-star {
+  position: absolute;
+  font-family: sans-serif;
+  color: #1a1510;
+}
+
+/* -- BOTTOM face -- */
+.bottom-inner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px;
+}
+
+.bottom-logo {
+  font-family: 'Abril Fatface', serif;
+  font-size: 12px;
+  color: rgba(106,80,64,0.5);
+  letter-spacing: 0.06em;
+}
+
+.bottom-barcode {
+  display: flex;
+  gap: 1px;
+  align-items: flex-end;
+  opacity: 0.35;
+}
+.bbar { background: #6a5040; }
+
+.bottom-text {
+  font-family: 'Caveat', cursive;
+  font-size: 8px;
+  color: rgba(106,80,64,0.5);
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* ── CUT MARKS ── */
+.cut-mark {
+  position: absolute;
+  pointer-events: none;
+}
+
+/* ════════════════════
+   3D PREVIEW VIEW
+════════════════════ */
+
+.preview-stage {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.box3d-wrap {
+  width: 340px;
+  height: 380px;
+  position: relative;
+  perspective: 900px;
+  cursor: grab;
+}
+
+.box3d {
+  width: 200px;
+  height: 200px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-style: preserve-3d;
+  transform: translate(-50%, -50%) rotateX(-18deg) rotateY(30deg);
+  transition: transform 0.6s cubic-bezier(0.34,1.2,0.64,1);
+}
+
+.box3d.spin-anim {
+  animation: boxSpin 12s linear infinite;
+}
+
+@keyframes boxSpin {
+  from { transform: translate(-50%, -50%) rotateX(-18deg) rotateY(0deg); }
+  to   { transform: translate(-50%, -50%) rotateX(-18deg) rotateY(360deg); }
+}
+
+.box-face {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border: 1.5px solid rgba(0,0,0,0.15);
+  overflow: hidden;
+  backface-visibility: visible;
+}
+
+/* 6 faces positioning */
+.bf-front  { transform: translateZ(100px); }
+.bf-back   { transform: rotateY(180deg) translateZ(100px); }
+.bf-left   { transform: rotateY(-90deg) translateZ(100px); }
+.bf-right  { transform: rotateY(90deg) translateZ(100px); }
+.bf-top    { transform: rotateX(90deg) translateZ(100px); }
+.bf-bottom { transform: rotateX(-90deg) translateZ(100px); }
+
+.bf-front  { background: #b8a090; }
+.bf-back   { background: #f0d8d0; }
+.bf-left   { background: #c8e0f0; }
+.bf-right  { background: #f5ede0; }
+.bf-top    { background: #e0d8c8; }
+.bf-bottom { background: #d4c4b0; }
+
+/* paper texture on 3D faces */
+.box-face::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.07'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* lighting overlay for 3D depth */
+.bf-left::before, .bf-right::before, .bf-top::before, .bf-bottom::before, .bf-back::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+.bf-left::before   { background: rgba(0,0,0,0.08); }
+.bf-right::before  { background: rgba(0,0,0,0.04); }
+.bf-top::before    { background: rgba(255,255,255,0.08); }
+.bf-bottom::before { background: rgba(0,0,0,0.15); }
+.bf-back::before   { background: rgba(0,0,0,0.1); }
+
+/* 3D content SVG fills */
+.face-svg { position: absolute; inset: 0; }
+
+/* controls */
+.controls-3d {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.ctrl-btn {
+  font-family: 'Caveat', cursive;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 8px 20px;
+  border: 2px solid #1a1510;
+  background: white;
+  color: #1a1510;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.ctrl-btn:hover { background: #e8c830; border-color: #e8c830; }
+.ctrl-btn.on { background: #1a1510; color: #e8c830; }
+
+.box-shadow-ground {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 180px;
+  height: 30px;
+  background: radial-gradient(ellipse, rgba(0,0,0,0.18) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* mystery lid reveal */
+.lid-open .bf-top {
+  animation: lidFlip 1s ease forwards;
+}
+@keyframes lidFlip {
+  to { transform: rotateX(90deg) translateZ(100px) rotateX(-130deg); }
+}
+
+/* face info cards */
+.face-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  max-width: 700px;
+  width: 100%;
+  margin-top: 8px;
+}
+.face-card {
+  background: white;
+  border: 1.5px solid #d0c0b0;
+  border-radius: 4px;
+  padding: 10px 12px;
+}
+.fc-title {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  color: #8a7060;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.fc-desc {
+  font-family: 'Caveat', cursive;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1a1510;
+  line-height: 1.4;
+}
+.fc-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-logo">Piano in the <span>Sky</span></div>
+  <div class="topbar-tag">Blind Box Packaging · 2026</div>
+  <div class="topbar-badges">
+    <span class="badge badge-yellow">Print-Ready</span>
+    <span class="badge badge-pink">Cut-Paper Style</span>
+  </div>
+</div>
+
+<!-- VIEW TOGGLE -->
+<div class="view-toggle">
+  <button class="vtab active" onclick="switchView('net',this)">📄 Flat Net / Template</button>
+  <button class="vtab" onclick="switchView('preview',this)">📦 3D Box Preview</button>
+</div>
+
+
+<!-- ════ FLAT NET VIEW ════ -->
+<div id="view-net" class="view active">
+  <div class="net-stage">
+    <div class="net-label">Die-Cut Net · All 6 Faces + Tabs + Flaps</div>
+
+    <div class="net-info">
+      <div class="info-chip">📐 Box: 7cm × 7cm × 7cm</div>
+      <div class="info-chip">🎨 Cut-Paper Collage Style</div>
+      <div class="info-chip">✂️ Dashed lines = fold / cut</div>
+      <div class="info-chip">🎵 Piano in the Sky · A.L. · 2026</div>
+    </div>
+
+    <div style="overflow-x:auto;padding-bottom:20px;">
+    <div class="box-net">
+
+      <!-- ── ROW 1: top flaps ── -->
+      <div class="face top-flap-left">
+        <div class="face-label">FLAP</div>
+      </div>
+      <div class="face top-flap-front">
+        <div class="face-label">TOP FLAP</div>
+        <!-- top flap has key strip -->
+        <svg width="160" height="40" viewBox="0 0 160 40" style="position:absolute;bottom:0;left:0;">
+          <rect x="0" y="20" width="160" height="20" fill="#b8a090"/>
+          <rect x="8" y="22" width="10" height="14" rx="1" fill="#faf4ec" stroke="#c8b898" stroke-width="0.5"/>
+          <rect x="20" y="22" width="10" height="14" rx="1" fill="#faf4ec" stroke="#c8b898" stroke-width="0.5"/>
+          <rect x="32" y="22" width="10" height="14" rx="1" fill="#faf4ec" stroke="#c8b898" stroke-width="0.5"/>
+          <rect x="44" y="22" width="10" height="14" rx="1" fill="#faf4ec" stroke="#c8b898" stroke-width="0.5"/>
+          <rect x="56" y="22" width="10" height="14" rx="1" fill="#faf4ec" stroke="#c8b898" stroke-width="0.5"/>
+          <rect x="68" y="22" width="10" height="14" rx="1" fill="#faf4ec" stroke="#c8b898" stroke-width="0.5"/>
+          <rect x="80" y="22" width="10" height="14" rx="1" fill="#faf4ec" stroke="#c8b898" stroke-width="0.5"/>
+          <rect x="92" y="22" width="10" height="14" rx="1" fill="#faf4ec" stroke="#c8b898" stroke-width="0.5"/>
+          <rect x="104" y="22" width="10" height="14" rx="1" fill="#faf4ec" stroke="#c8b898" stroke-width="0.5"/>
+          <rect x="116" y="22" width="10" height="14" rx="1" fill="#faf4ec" stroke="#c8b898" stroke-width="0.5"/>
+          <rect x="128" y="22" width="10" height="14" rx="1" fill="#faf4ec" stroke="#c8b898" stroke-width="0.5"/>
+          <rect x="140" y="22" width="10" height="14" rx="1" fill="#faf4ec" stroke="#c8b898" stroke-width="0.5"/>
+          <!-- black keys -->
+          <rect x="13" y="22" width="6" height="9" rx="1" fill="#2a1a10"/>
+          <rect x="37" y="22" width="6" height="9" rx="1" fill="#2a1a10"/>
+          <rect x="61" y="22" width="6" height="9" rx="1" fill="#2a1a10"/>
+          <rect x="85" y="22" width="6" height="9" rx="1" fill="#2a1a10"/>
+          <rect x="109" y="22" width="6" height="9" rx="1" fill="#2a1a10"/>
+          <rect x="133" y="22" width="6" height="9" rx="1" fill="#2a1a10"/>
+        </svg>
+      </div>
+      <div class="face top-flap-right">
+        <div class="face-label">FLAP</div>
+      </div>
+      <div class="face top-flap-back">
+        <div class="face-label">FLAP</div>
+      </div>
+
+      <!-- ── ROW 2: main faces ── -->
+
+      <!-- TAB L -->
+      <div class="face face-tab-l"></div>
+
+      <!-- LEFT FACE — sky blue mystery -->
+      <div class="face face-left">
+        <div class="face-label">LEFT</div>
+        <div class="left-inner">
+          <div class="left-sky-gradient"></div>
+          <div class="left-cloud-1"></div>
+          <div class="left-cloud-2"></div>
+          <div class="left-label-top">What's inside?</div>
+
+          <svg width="160" height="160" viewBox="0 0 160 160" style="position:absolute;inset:0;">
+            <!-- sky -->
+            <rect width="160" height="160" fill="#c8e0f0"/>
+            <!-- ground strip -->
+            <rect x="0" y="130" width="160" height="30" fill="#b8d8a0" rx="0"/>
+            <!-- clouds -->
+            <ellipse cx="35" cy="65" rx="22" ry="10" fill="rgba(255,255,255,0.65)"/>
+            <ellipse cx="28" cy="65" rx="14" ry="8" fill="rgba(255,255,255,0.65)"/>
+            <ellipse cx="118" cy="78" rx="18" ry="8" fill="rgba(255,255,255,0.5)"/>
+            <!-- big ? marks -->
+            <text x="50" y="115" font-family="'Abril Fatface',serif" font-size="58" fill="rgba(255,255,255,0.7)" stroke="rgba(0,0,0,0.08)" stroke-width="1">?</text>
+            <!-- stars -->
+            <text x="18" y="130" font-family="sans-serif" font-size="18" fill="#e8c830">★</text>
+            <text x="44" y="138" font-family="sans-serif" font-size="14" fill="#e8c830">★</text>
+            <text x="68" y="130" font-family="sans-serif" font-size="20" fill="#e8c830">★</text>
+            <text x="96" y="136" font-family="sans-serif" font-size="16" fill="#e8c830">★</text>
+            <!-- top pink label -->
+            <rect x="20" y="8" width="120" height="20" rx="3" fill="#e86b8a"/>
+            <text x="80" y="22" font-family="'Caveat',cursive" font-size="12" font-weight="700" fill="white" text-anchor="middle">What's Inside?</text>
+            <!-- piano deco small -->
+            <rect x="10" y="96" width="38" height="20" rx="3" fill="rgba(255,255,255,0.4)"/>
+            <rect x="13" y="99" width="5" height="12" rx="1" fill="rgba(0,0,0,0.15)"/>
+            <rect x="19" y="99" width="5" height="12" rx="1" fill="rgba(0,0,0,0.15)"/>
+            <rect x="25" y="99" width="5" height="12" rx="1" fill="rgba(0,0,0,0.15)"/>
+            <rect x="31" y="99" width="5" height="12" rx="1" fill="rgba(0,0,0,0.15)"/>
+            <rect x="15" y="99" width="3" height="8" rx="1" fill="rgba(0,0,0,0.4)"/>
+            <rect x="27" y="99" width="3" height="8" rx="1" fill="rgba(0,0,0,0.4)"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- FRONT FACE — main panel -->
+      <div class="face face-front">
+        <div class="face-label">FRONT</div>
+        <div class="front-inner">
+          <div class="front-cloud-l"></div>
+          <div class="front-cloud-r"></div>
+          <div class="front-star-tr">✦✦</div>
+
+          <!-- cut-letter PIANO at top -->
+          <div class="front-ransom-top">
+            <span class="rc rc-p">P</span>
+            <span class="rc rc-i">I</span>
+            <span class="rc rc-a">A</span>
+            <span class="rc rc-n">N</span>
+            <span class="rc rc-o">O</span>
+          </div>
+
+          <!-- floating piano -->
+          <div class="front-piano-svg">
+            <svg viewBox="0 0 160 55" xmlns="http://www.w3.org/2000/svg" width="100%">
+              <filter id="ps2"><feDropShadow dx="2" dy="3" stdDeviation="4" flood-color="rgba(0,0,0,0.35)"/></filter>
+              <g filter="url(#ps2)">
+                <rect x="4" y="10" width="152" height="38" rx="4" fill="#f0e8da"/>
+                <rect x="4" y="10" width="152" height="6" rx="3" fill="#e0d8c8"/>
+                <rect x="8" y="18" width="9" height="24" rx="1" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+                <rect x="18" y="18" width="9" height="24" rx="1" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+                <rect x="28" y="18" width="9" height="24" rx="1" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+                <rect x="38" y="18" width="9" height="24" rx="1" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+                <rect x="48" y="18" width="9" height="24" rx="1" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+                <rect x="58" y="18" width="9" height="24" rx="1" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+                <rect x="68" y="18" width="9" height="24" rx="1" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+                <rect x="78" y="18" width="9" height="24" rx="1" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+                <rect x="88" y="18" width="9" height="24" rx="1" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+                <rect x="98" y="18" width="9" height="24" rx="1" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+                <rect x="108" y="18" width="9" height="24" rx="1" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+                <rect x="118" y="18" width="9" height="24" rx="1" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+                <rect x="128" y="18" width="9" height="24" rx="1" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+                <rect x="138" y="18" width="9" height="24" rx="1" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+                <rect x="13" y="18" width="6" height="15" rx="1" fill="#2a1a10"/>
+                <rect x="23" y="18" width="6" height="15" rx="1" fill="#2a1a10"/>
+                <rect x="43" y="18" width="6" height="15" rx="1" fill="#2a1a10"/>
+                <rect x="53" y="18" width="6" height="15" rx="1" fill="#2a1a10"/>
+                <rect x="63" y="18" width="6" height="15" rx="1" fill="#2a1a10"/>
+                <rect x="83" y="18" width="6" height="15" rx="1" fill="#2a1a10"/>
+                <rect x="93" y="18" width="6" height="15" rx="1" fill="#2a1a10"/>
+                <rect x="113" y="18" width="6" height="15" rx="1" fill="#2a1a10"/>
+                <rect x="123" y="18" width="6" height="15" rx="1" fill="#2a1a10"/>
+                <rect x="133" y="18" width="6" height="15" rx="1" fill="#2a1a10"/>
+                <!-- pink highlight key -->
+                <rect x="23" y="30" width="6" height="3" rx="1" fill="#e86b8a" opacity="0.8"/>
+                <rect x="63" y="26" width="6" height="3" rx="1" fill="#e8c830" opacity="0.9"/>
+                <!-- music notes floating -->
+                <text x="76" y="7" font-family="serif" font-size="10" fill="#e86b8a" opacity="0.8">♪</text>
+                <text x="94" y="5" font-family="serif" font-size="8" fill="#7ab8d4" opacity="0.7">♩</text>
+              </g>
+            </svg>
+          </div>
+
+          <!-- "in the SKY" strip -->
+          <div class="in-sky-strip">
+            <div class="strip-black">in the</div>
+            <div class="strip-blue">SKY</div>
+          </div>
+          <!-- artist -->
+          <div style="background:#e86b8a;color:white;font-family:'Caveat',cursive;font-size:10px;font-weight:700;padding:2px 8px;transform:rotate(-1deg);margin-bottom:4px;">a.l. · 2026</div>
+        </div>
+      </div>
+
+      <!-- RIGHT FACE — tracklist -->
+      <div class="face face-right">
+        <div class="face-label">RIGHT</div>
+        <div class="right-inner">
+          <div class="right-tape-h"></div>
+          <div class="right-title">Tracklist</div>
+          <div class="right-track-mini">
+            01 · Piano in the Sky ★<br>
+            02 · He Had a Cat<br>
+            03 · Crying in a Fancy<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Restaurant<br>
+            04 · You Remind Me ★<br>
+            05 · The Astronomer<br>
+            06 · Seven Times<br>
+            07 · Grand Piano ★
+          </div>
+          <div class="right-bottom-block">
+            <span class="rb-year">2026</span>
+            <span class="rb-label">Floating Keys Records</span>
+          </div>
+          <!-- star deco -->
+          <div style="position:absolute;bottom:14px;right:10px;font-family:sans-serif;font-size:20px;color:rgba(184,160,144,0.3);">✦</div>
+        </div>
+      </div>
+
+      <!-- BACK FACE — polaroids + sentence -->
+      <div class="face face-back">
+        <div class="face-label">BACK</div>
+        <div class="back-inner">
+          <!-- polaroid 1 -->
+          <div class="back-polaroid" style="width:68px;top:8px;left:8px;transform:rotate(-5deg);">
+            <svg viewBox="0 0 58 58" width="58" height="58">
+              <rect width="58" height="58" fill="#7aab6a"/>
+              <ellipse cx="29" cy="26" rx="14" ry="10" fill="#5a8a4a"/>
+              <rect x="12" y="38" width="34" height="6" rx="3" fill="#4a7a3a"/>
+              <ellipse cx="29" cy="18" rx="6" ry="4" fill="#e07840"/>
+              <text x="16" y="52" font-family="sans-serif" font-size="10" fill="#e8c830">★ ★</text>
+            </svg>
+            <div style="font-family:'Caveat',cursive;font-size:7px;color:#888;text-align:center;margin-top:3px;">spring '26</div>
+          </div>
+          <!-- polaroid 2 -->
+          <div class="back-polaroid" style="width:60px;top:6px;right:10px;transform:rotate(4deg);">
+            <svg viewBox="0 0 50 50" width="50" height="50">
+              <rect width="50" height="50" fill="#c8e0f0"/>
+              <circle cx="25" cy="22" r="12" fill="#e8d0a8"/>
+              <text x="17" y="27" font-size="14" fill="#c0a870" font-family="serif">☁</text>
+              <rect x="8" y="36" width="34" height="4" rx="2" fill="#a0c8e8"/>
+            </svg>
+            <div style="font-family:'Caveat',cursive;font-size:7px;color:#888;text-align:center;margin-top:3px;">him, again</div>
+          </div>
+          <!-- star cutouts -->
+          <div class="back-deco-star" style="top:78px;left:10px;font-size:18px;transform:rotate(12deg);">✦</div>
+          <div class="back-deco-star" style="top:90px;right:12px;font-size:12px;transform:rotate(-8deg);">✦</div>
+          <!-- tape strip -->
+          <div style="position:absolute;top:88px;left:40%;width:40px;height:10px;background:rgba(122,184,212,0.55);transform:rotate(-15deg);"></div>
+          <!-- sentence -->
+          <div class="back-sentence">
+            "The absurd yearning of love in contrast to reality as a young adult in the modern age"
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB R -->
+      <div class="face face-tab-r"></div>
+
+      <!-- ── ROW 3: bottom ── -->
+      <div class="face face-bottom" style="grid-column:3;grid-row:3;">
+        <div class="face-label">BOTTOM</div>
+        <div class="bottom-inner">
+          <div class="bottom-logo">Piano in the Sky · A.L.</div>
+          <div class="bottom-barcode">
+            <div class="bbar" style="width:2px;height:28px"></div>
+            <div class="bbar" style="width:1px;height:28px"></div>
+            <div class="bbar" style="width:3px;height:28px"></div>
+            <div class="bbar" style="width:1px;height:28px"></div>
+            <div class="bbar" style="width:2px;height:28px"></div>
+            <div class="bbar" style="width:1px;height:28px"></div>
+            <div class="bbar" style="width:1px;height:24px"></div>
+            <div class="bbar" style="width:2px;height:28px"></div>
+            <div class="bbar" style="width:3px;height:28px"></div>
+            <div class="bbar" style="width:1px;height:28px"></div>
+            <div class="bbar" style="width:2px;height:24px"></div>
+            <div class="bbar" style="width:1px;height:28px"></div>
+          </div>
+          <div class="bottom-text">
+            © 2026 Floating Keys Records<br>
+            Manufactured in Cloud Nine Studio<br>
+            0 26149 40023 4
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ROW 4: bottom flap ── -->
+      <div class="face bot-flap-front" style="grid-column:3;grid-row:4;">
+        <div class="face-label" style="bottom:4px;top:auto;">BOTTOM FLAP</div>
+      </div>
+
+    </div><!-- end box-net -->
+    </div><!-- end scroll -->
+
+    <!-- face legend -->
+    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:24px;">
+      <div style="display:flex;align-items:center;gap:6px;font-family:'Caveat',cursive;font-size:13px;color:#6a5040;">
+        <div style="width:14px;height:14px;background:#b8a090;border:1px solid #8a6f5e;border-radius:2px;flex-shrink:0;"></div> Front — Cut-paper collage
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;font-family:'Caveat',cursive;font-size:13px;color:#6a5040;">
+        <div style="width:14px;height:14px;background:#c8e0f0;border:1px solid #8a9fb0;border-radius:2px;flex-shrink:0;"></div> Left — Mystery sky
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;font-family:'Caveat',cursive;font-size:13px;color:#6a5040;">
+        <div style="width:14px;height:14px;background:#f5ede0;border:1px solid #b0a090;border-radius:2px;flex-shrink:0;"></div> Right — Tracklist
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;font-family:'Caveat',cursive;font-size:13px;color:#6a5040;">
+        <div style="width:14px;height:14px;background:#f0d8d0;border:1px solid #b0907c;border-radius:2px;flex-shrink:0;"></div> Back — Polaroids + concept
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ════ 3D PREVIEW VIEW ════ -->
+<div id="view-preview" class="view">
+  <div class="preview-stage">
+
+    <div style="text-align:center;margin-bottom:8px;">
+      <div style="font-family:'Unbounded',sans-serif;font-size:10px;letter-spacing:0.2em;color:#8a7060;text-transform:uppercase;">Interactive 3D Preview</div>
+      <div style="font-family:'Caveat',cursive;font-size:14px;color:#8a7060;margin-top:4px;">hover to pause · click buttons to rotate</div>
+    </div>
+
+    <div class="box3d-wrap" id="box3dWrap">
+      <div class="box-shadow-ground"></div>
+      <div class="box3d spin-anim" id="box3d">
+
+        <!-- FRONT face -->
+        <div class="box-face bf-front">
+          <svg class="face-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <rect width="200" height="200" fill="#b8a090"/>
+            <!-- clouds -->
+            <ellipse cx="30" cy="90" rx="28" ry="12" fill="rgba(255,255,255,0.18)"/>
+            <ellipse cx="170" cy="110" rx="22" ry="9" fill="rgba(255,255,255,0.13)"/>
+            <!-- stars top right -->
+            <text x="156" y="26" font-family="sans-serif" font-size="20" fill="#1a1510">✦</text>
+            <text x="168" y="46" font-family="sans-serif" font-size="14" fill="#1a1510">✦</text>
+            <!-- PIANO ransom blocks -->
+            <rect x="10" y="12" width="28" height="30" rx="2" fill="#7ab8d4"/>
+            <text x="24" y="36" font-family="'Abril Fatface',serif" font-size="26" fill="white" text-anchor="middle">P</text>
+            <rect x="40" y="14" width="20" height="26" rx="2" fill="#e8c830" transform="rotate(2,50,27)"/>
+            <text x="50" y="35" font-family="'Unbounded',sans-serif" font-size="16" fill="#1a1510" text-anchor="middle">I</text>
+            <rect x="62" y="10" width="28" height="32" rx="2" fill="#e86b8a" transform="rotate(-2,76,26)"/>
+            <text x="76" y="36" font-family="'Permanent Marker',cursive" font-size="24" fill="white" text-anchor="middle">A</text>
+            <rect x="92" y="14" width="24" height="28" rx="2" fill="#f5ede0" transform="rotate(1,104,28)"/>
+            <text x="104" y="36" font-family="'Abril Fatface',serif" font-size="22" fill="#6a5040" text-anchor="middle">N</text>
+            <rect x="118" y="10" width="28" height="32" rx="2" fill="#7aab6a" transform="rotate(-2,132,26)"/>
+            <text x="132" y="36" font-family="'Righteous',sans-serif" font-size="24" fill="white" text-anchor="middle">O</text>
+            <!-- piano -->
+            <rect x="20" y="58" width="160" height="55" rx="4" fill="#f0e8da"/>
+            <rect x="20" y="58" width="160" height="8" rx="3" fill="#e0d8c8"/>
+            <rect x="26" y="68" width="10" height="38" rx="2" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+            <rect x="38" y="68" width="10" height="38" rx="2" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+            <rect x="50" y="68" width="10" height="38" rx="2" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+            <rect x="62" y="68" width="10" height="38" rx="2" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+            <rect x="74" y="68" width="10" height="38" rx="2" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+            <rect x="86" y="68" width="10" height="38" rx="2" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+            <rect x="98" y="68" width="10" height="38" rx="2" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+            <rect x="110" y="68" width="10" height="38" rx="2" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+            <rect x="122" y="68" width="10" height="38" rx="2" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+            <rect x="134" y="68" width="10" height="38" rx="2" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+            <rect x="146" y="68" width="10" height="38" rx="2" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+            <rect x="158" y="68" width="10" height="38" rx="2" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+            <rect x="32" y="68" width="6" height="22" rx="1" fill="#2a1a10"/>
+            <rect x="56" y="68" width="6" height="22" rx="1" fill="#2a1a10"/>
+            <rect x="80" y="68" width="6" height="22" rx="1" fill="#2a1a10"/>
+            <rect x="104" y="68" width="6" height="22" rx="1" fill="#2a1a10"/>
+            <rect x="128" y="68" width="6" height="22" rx="1" fill="#2a1a10"/>
+            <rect x="152" y="68" width="6" height="22" rx="1" fill="#2a1a10"/>
+            <!-- pink key highlight -->
+            <rect x="56" y="86" width="6" height="3" rx="1" fill="#e86b8a"/>
+            <text x="90" y="57" font-family="serif" font-size="12" fill="#e86b8a">♪</text>
+            <text x="115" y="54" font-family="serif" font-size="10" fill="#7ab8d4">♩</text>
+            <!-- in the SKY -->
+            <rect x="16" y="132" width="60" height="20" rx="2" fill="#1a1510"/>
+            <text x="46" y="146" font-family="'Caveat',cursive" font-size="12" font-weight="700" fill="#e8c830" text-anchor="middle">in the</text>
+            <rect x="80" y="130" width="52" height="22" rx="2" fill="#7ab8d4" transform="rotate(1,106,141)"/>
+            <text x="106" y="146" font-family="'Abril Fatface',serif" font-size="16" fill="white" text-anchor="middle">SKY</text>
+            <!-- artist tag -->
+            <rect x="16" y="158" width="80" height="18" rx="2" fill="#e86b8a" transform="rotate(-1,56,167)"/>
+            <text x="56" y="171" font-family="'Caveat',cursive" font-size="12" font-weight="700" fill="white" text-anchor="middle">a.l. · 2026</text>
+            <!-- tape deco -->
+            <rect x="10" y="170" width="30" height="10" rx="2" fill="rgba(232,200,48,0.5)" transform="rotate(3,25,175)"/>
+          </svg>
+        </div>
+
+        <!-- BACK face -->
+        <div class="box-face bf-back">
+          <svg class="face-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <rect width="200" height="200" fill="#f0d8d0"/>
+            <!-- polaroids -->
+            <rect x="14" y="10" width="70" height="78" rx="2" fill="white" transform="rotate(-5,49,49)"/>
+            <rect x="16" y="12" width="66" height="64" rx="1" fill="#7aab6a" transform="rotate(-5,49,49)"/>
+            <ellipse cx="40" cy="38" rx="16" ry="12" fill="#5a8a4a" transform="rotate(-5,49,49)"/>
+            <text x="26" y="68" font-family="sans-serif" font-size="12" fill="#e8c830" transform="rotate(-5,49,49)">★★★</text>
+
+            <rect x="100" y="8" width="66" height="74" rx="2" fill="white" transform="rotate(4,133,45)"/>
+            <rect x="102" y="10" width="62" height="60" rx="1" fill="#c8e0f0" transform="rotate(4,133,45)"/>
+            <circle cx="133" cy="36" r="16" fill="#e8d0a8" transform="rotate(4,133,45)"/>
+            <text x="124" y="66" font-family="sans-serif" font-size="10" fill="#1a1510" transform="rotate(4,133,45)">☁ ☁</text>
+
+            <!-- star cutouts -->
+            <text x="80" y="85" font-family="sans-serif" font-size="22" fill="#1a1510" transform="rotate(10,91,74)">✦</text>
+            <text x="60" y="105" font-family="sans-serif" font-size="14" fill="#1a1510" transform="rotate(-8,67,98)">✦</text>
+
+            <!-- tape -->
+            <rect x="85" y="15" width="28" height="10" rx="2" fill="rgba(122,184,212,0.55)" transform="rotate(-25,99,20)"/>
+
+            <!-- sentence -->
+            <rect x="10" y="128" width="180" height="58" rx="3" fill="#1a1510"/>
+            <text x="100" y="148" font-family="'Caveat',cursive" font-size="10" font-weight="700" fill="#e8c830" text-anchor="middle">"The absurd yearning of love</text>
+            <text x="100" y="162" font-family="'Caveat',cursive" font-size="10" font-weight="700" fill="#e8c830" text-anchor="middle">in contrast to reality as a</text>
+            <text x="100" y="176" font-family="'Caveat',cursive" font-size="10" font-weight="700" fill="#e8c830" text-anchor="middle">young adult in the modern age"</text>
+          </svg>
+        </div>
+
+        <!-- LEFT face -->
+        <div class="box-face bf-left">
+          <svg class="face-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <rect width="200" height="200" fill="#c8e0f0"/>
+            <rect x="0" y="162" width="200" height="38" fill="#b8d8a0"/>
+            <ellipse cx="50" cy="80" rx="30" ry="14" fill="rgba(255,255,255,0.6)"/>
+            <ellipse cx="38" cy="80" rx="18" ry="10" fill="rgba(255,255,255,0.6)"/>
+            <ellipse cx="150" cy="95" rx="24" ry="11" fill="rgba(255,255,255,0.5)"/>
+            <text x="60" y="148" font-family="'Abril Fatface',serif" font-size="72" fill="rgba(255,255,255,0.65)">?</text>
+            <text x="18" y="190" font-family="sans-serif" font-size="18" fill="#e8c830">★</text>
+            <text x="46" y="196" font-family="sans-serif" font-size="14" fill="#e8c830">★</text>
+            <text x="72" y="190" font-family="sans-serif" font-size="22" fill="#e8c830">★</text>
+            <text x="102" y="194" font-family="sans-serif" font-size="16" fill="#e8c830">★</text>
+            <text x="132" y="190" font-family="sans-serif" font-size="19" fill="#e8c830">★</text>
+            <rect x="20" y="10" width="160" height="28" rx="4" fill="#e86b8a"/>
+            <text x="100" y="29" font-family="'Caveat',cursive" font-size="16" font-weight="700" fill="white" text-anchor="middle">What's Inside?</text>
+          </svg>
+        </div>
+
+        <!-- RIGHT face -->
+        <div class="box-face bf-right">
+          <svg class="face-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <rect width="200" height="200" fill="#f5ede0"/>
+            <rect x="14" y="14" width="90" height="20" rx="3" fill="rgba(0,0,0,0.06)"/>
+            <text x="18" y="28" font-family="'Permanent Marker',cursive" font-size="16" fill="#6a5040">Tracklist</text>
+            <line x1="14" y1="40" x2="60" y2="40" stroke="#e86b8a" stroke-width="3"/>
+            <text x="14" y="58" font-family="'Caveat',cursive" font-size="13" font-weight="700" fill="#4a3028">01 · Piano in the Sky ★</text>
+            <text x="14" y="75" font-family="'Caveat',cursive" font-size="13" fill="#6a5040">02 · He Had a Cat</text>
+            <text x="14" y="92" font-family="'Caveat',cursive" font-size="13" fill="#6a5040">03 · Crying in a Fancy</text>
+            <text x="24" y="109" font-family="'Caveat',cursive" font-size="13" fill="#6a5040">Restaurant</text>
+            <text x="14" y="126" font-family="'Caveat',cursive" font-size="13" font-weight="700" fill="#4a3028">04 · You Remind Me ★</text>
+            <text x="14" y="143" font-family="'Caveat',cursive" font-size="13" fill="#6a5040">05 · The Astronomer</text>
+            <text x="14" y="160" font-family="'Caveat',cursive" font-size="13" fill="#6a5040">06 · Seven Times</text>
+            <text x="14" y="177" font-family="'Caveat',cursive" font-size="13" font-weight="700" fill="#4a3028">07 · Grand Piano ★</text>
+            <rect x="140" y="60" width="36" height="10" rx="2" fill="rgba(232,200,48,0.55)" transform="rotate(10,158,65)"/>
+            <text x="170" y="185" font-family="'Abril Fatface',serif" font-size="36" fill="rgba(184,160,144,0.2)" transform="rotate(-8,170,175)">2026</text>
+          </svg>
+        </div>
+
+        <!-- TOP face -->
+        <div class="box-face bf-top">
+          <svg class="face-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <rect width="200" height="200" fill="#e0d8c8"/>
+            <!-- piano keys strip across top -->
+            <rect x="0" y="70" width="200" height="60" fill="#f0e8da"/>
+            <rect x="0" y="70" width="200" height="8" fill="#e0d8c8"/>
+            <rect x="6" y="80" width="12" height="42" rx="2" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+            <rect x="20" y="80" width="12" height="42" rx="2" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+            <rect x="34" y="80" width="12" height="42" rx="2" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+            <rect x="48" y="80" width="12" height="42" rx="2" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+            <rect x="62" y="80" width="12" height="42" rx="2" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+            <rect x="76" y="80" width="12" height="42" rx="2" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+            <rect x="90" y="80" width="12" height="42" rx="2" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+            <rect x="104" y="80" width="12" height="42" rx="2" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+            <rect x="118" y="80" width="12" height="42" rx="2" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+            <rect x="132" y="80" width="12" height="42" rx="2" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+            <rect x="146" y="80" width="12" height="42" rx="2" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+            <rect x="160" y="80" width="12" height="42" rx="2" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+            <rect x="174" y="80" width="12" height="42" rx="2" fill="#faf4ec" stroke="#d8c8a8" stroke-width="0.5"/>
+            <rect x="12" y="80" width="7" height="26" rx="1" fill="#2a1a10"/>
+            <rect x="40" y="80" width="7" height="26" rx="1" fill="#2a1a10"/>
+            <rect x="68" y="80" width="7" height="26" rx="1" fill="#2a1a10"/>
+            <rect x="96" y="80" width="7" height="26" rx="1" fill="#2a1a10"/>
+            <rect x="124" y="80" width="7" height="26" rx="1" fill="#2a1a10"/>
+            <rect x="152" y="80" width="7" height="26" rx="1" fill="#2a1a10"/>
+            <!-- text above -->
+            <text x="100" y="58" font-family="'Abril Fatface',serif" font-size="18" fill="#8a7060" text-anchor="middle" opacity="0.6">PIANO IN THE SKY</text>
+            <!-- text below -->
+            <text x="100" y="155" font-family="'Caveat',cursive" font-size="14" fill="#8a7060" text-anchor="middle" opacity="0.5">a.l. · 2026 · floating keys records</text>
+          </svg>
+        </div>
+
+        <!-- BOTTOM face -->
+        <div class="box-face bf-bottom">
+          <svg class="face-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <rect width="200" height="200" fill="#d4c4b0"/>
+            <text x="100" y="80" font-family="'Abril Fatface',serif" font-size="13" fill="rgba(106,80,64,0.4)" text-anchor="middle">Piano in the Sky · A.L.</text>
+            <g transform="translate(62,100)" opacity="0.3">
+              <rect x="0" y="0" width="2" height="30" fill="#6a5040"/>
+              <rect x="4" y="0" width="1" height="30" fill="#6a5040"/>
+              <rect x="7" y="0" width="3" height="30" fill="#6a5040"/>
+              <rect x="12" y="0" width="1" height="30" fill="#6a5040"/>
+              <rect x="15" y="0" width="2" height="30" fill="#6a5040"/>
+              <rect x="19" y="0" width="1" height="26" fill="#6a5040"/>
+              <rect x="22" y="0" width="2" height="30" fill="#6a5040"/>
+              <rect x="26" y="0" width="3" height="30" fill="#6a5040"/>
+              <rect x="31" y="0" width="1" height="30" fill="#6a5040"/>
+              <rect x="34" y="0" width="2" height="26" fill="#6a5040"/>
+              <rect x="38" y="0" width="1" height="30" fill="#6a5040"/>
+              <rect x="41" y="0" width="2" height="30" fill="#6a5040"/>
+              <rect x="45" y="0" width="1" height="30" fill="#6a5040"/>
+              <rect x="48" y="0" width="3" height="30" fill="#6a5040"/>
+              <rect x="53" y="0" width="1" height="26" fill="#6a5040"/>
+              <rect x="56" y="0" width="2" height="30" fill="#6a5040"/>
+              <rect x="60" y="0" width="1" height="30" fill="#6a5040"/>
+              <rect x="63" y="0" width="3" height="30" fill="#6a5040"/>
+              <rect x="68" y="0" width="1" height="30" fill="#6a5040"/>
+              <rect x="71" y="0" width="2" height="26" fill="#6a5040"/>
+              <rect x="75" y="0" width="1" height="30" fill="#6a5040"/>
+            </g>
+            <text x="100" y="148" font-family="'Caveat',cursive" font-size="9" fill="rgba(106,80,64,0.4)" text-anchor="middle">0 26149 40023 4</text>
+            <text x="100" y="164" font-family="'Caveat',cursive" font-size="9" fill="rgba(106,80,64,0.35)" text-anchor="middle">© 2026 Floating Keys Records</text>
+          </svg>
+        </div>
+
+      </div><!-- end box3d -->
+    </div><!-- end box3dWrap -->
+
+    <!-- controls -->
+    <div class="controls-3d">
+      <button class="ctrl-btn" onclick="rotateBox('left')">← Rotate Left</button>
+      <button class="ctrl-btn on" id="spinBtn" onclick="toggleSpin()">⟳ Auto-Spin On</button>
+      <button class="ctrl-btn" onclick="rotateBox('right')">Rotate Right →</button>
+    </div>
+
+    <!-- face cards info -->
+    <div class="face-cards">
+      <div class="face-card">
+        <div class="fc-title">Front Face</div>
+        <div class="fc-desc"><span class="fc-dot" style="background:#b8a090;"></span>Cut-paper piano collage with ransom-note PIANO letters</div>
+      </div>
+      <div class="face-card">
+        <div class="fc-title">Left Side</div>
+        <div class="fc-desc"><span class="fc-dot" style="background:#c8e0f0;"></span>Sky blue mystery panel — "What's Inside?" with stars</div>
+      </div>
+      <div class="face-card">
+        <div class="fc-title">Right Side</div>
+        <div class="fc-desc"><span class="fc-dot" style="background:#f5ede0;"></span>Cream tracklist panel — all 7 songs handwritten</div>
+      </div>
+      <div class="face-card">
+        <div class="fc-title">Back Face</div>
+        <div class="fc-desc"><span class="fc-dot" style="background:#f0d8d0;"></span>Polaroid collage + concept sentence strip</div>
+      </div>
+      <div class="face-card">
+        <div class="fc-title">Top Face</div>
+        <div class="fc-desc"><span class="fc-dot" style="background:#e0d8c8;"></span>Full piano keys strip — the lid!</div>
+      </div>
+      <div class="face-card">
+        <div class="fc-title">Bottom Face</div>
+        <div class="fc-desc"><span class="fc-dot" style="background:#d4c4b0;"></span>Barcode + label info · Floating Keys Records</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<script>
+function switchView(id, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.vtab').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+let currentAngleY = 30;
+let spinning = true;
+
+function rotateBox(dir) {
+  const box = document.getElementById('box3d');
+  box.classList.remove('spin-anim');
+  spinning = false;
+  document.getElementById('spinBtn').textContent = '⟳ Auto-Spin Off';
+  document.getElementById('spinBtn').classList.remove('on');
+  currentAngleY += (dir === 'right' ? 45 : -45);
+  box.style.transition = 'transform 0.5s cubic-bezier(0.34,1.2,0.64,1)';
+  box.style.transform = `translate(-50%, -50%) rotateX(-18deg) rotateY(${currentAngleY}deg)`;
+}
+
+function toggleSpin() {
+  const box = document.getElementById('box3d');
+  const btn = document.getElementById('spinBtn');
+  spinning = !spinning;
+  if (spinning) {
+    box.style.transform = '';
+    box.classList.add('spin-anim');
+    btn.textContent = '⟳ Auto-Spin On';
+    btn.classList.add('on');
+  } else {
+    box.classList.remove('spin-anim');
+    btn.textContent = '⟳ Auto-Spin Off';
+    btn.classList.remove('on');
+  }
+}
+
+// pause spin on hover
+const wrap = document.getElementById('box3dWrap');
+if (wrap) {
+  wrap.addEventListener('mouseenter', () => {
+    if (spinning) document.getElementById('box3d').style.animationPlayState = 'paused';
+  });
+  wrap.addEventListener('mouseleave', () => {
+    if (spinning) document.getElementById('box3d').style.animationPlayState = 'running';
+  });
+}
+</script>
+</body>
+</html>
